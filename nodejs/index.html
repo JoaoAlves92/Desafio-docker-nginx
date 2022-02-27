@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>FullCycle</title>
+</head>
+<body onload="updateList()">
+    <main class="container">
+        <h1>Full Cycle Rocks!</h1>
+
+        <form id="userForm">
+            <label for="name" class="form-label">Digite seu nome:</label>
+            <input id="name" class="form-control" type="text" placeholder="Nome" required/>
+            <button type="submit" class="btn btn-primary">Enviar</button>
+        </form>
+
+        <ul id="user-list" class="list-group">
+        </ul>
+    </main>
+
+    <script>
+        function updateList() {
+            fetch('/users')
+                .then(data => {
+                    return data.json()
+                })
+                .then(res => {
+                    res.forEach((obj) => {
+                        var listaUser = document.getElementById('user-list')
+                        var listItem = document.createElement('li')
+                        listItem.classList.add('list-group-item')
+                        listItem.innerHTML=`${obj.name}`
+                        listaUser.appendChild(listItem)
+                    })
+                })
+                .catch(err => {
+                    console.log('err', err)
+                })
+        }
+
+        function sendName(e) {
+            e.preventDefault()
+            var name = e.target[0].value
+            fetch('/users/', {
+                    headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                    },
+                    method: "POST",
+                    body: JSON.stringify({name: name})
+                })
+                .then(data => {
+                    return data.json()
+                })
+                .then(res => {
+                    alert('Inserido com sucesso')
+                    var listaUser = document.getElementById('user-list')
+                    var listItem = document.createElement('li')
+                    listItem.classList.add('list-group-item')
+                    listItem.innerHTML=`${res.name}`
+                    listaUser.appendChild(listItem)
+                    })
+                .catch(err => {
+                    alert('Houve um erro na inserção do nome.')
+                    console.log(err)
+                })
+        }
+
+        document.getElementById('userForm').addEventListener('submit', (e) => {
+            sendName(e)
+        })
+    </script>
+</body>
+</html>
